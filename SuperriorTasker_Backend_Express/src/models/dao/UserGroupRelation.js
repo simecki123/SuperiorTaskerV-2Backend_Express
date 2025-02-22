@@ -4,14 +4,12 @@ const Role = require('../enums/Role');
 
 const userGroupRelationSchema = new mongoose.Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: [true, 'User ID is required'],
         maxLength: 50
     },
     groupId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Group',
+        type: String,
         required: [true, 'Group ID is required'],
         maxLength: 50
     },
@@ -27,4 +25,4 @@ const userGroupRelationSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('UserGroupRelation', userGroupRelationSchema);
+module.exports = mongoose.model('UserGroupRelation', userGroupRelationSchema, 'user-group-relation');
