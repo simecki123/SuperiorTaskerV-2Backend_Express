@@ -6,6 +6,8 @@ const userDetailsService = require('./UserDetailsService');
 const jwtUtils = require('../utils/JwtUtils');
 const LoginResponse = require('../api/dto/LoginResponse');
 const RegisterUserResponse = require('../api/dto/RegisterUserResponse');
+const UserDto = require('../../models/dto/UserDto');
+const s3Service = require('../../services/s3Service');
 
 class AuthService {
     async fetchMe(token) {
@@ -22,15 +24,21 @@ class AuthService {
 
             const userGroupRelations = await UserGroupRelation.find({ userId: user.id });
 
-            return {
-                id: user._id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                description: user.description,
-                profileUri: user.photoUri,
-                groupMembershipData: userGroupRelations
-            };
+            const profileUrl = await s3Service.getPhotoUrl(user.photoUri);
+
+            return new UserDto(
+                {
+                    id: user._id,
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    description: user.description,
+                    profileUri: profileUrl,
+                    groupMembershipData: userGroupRelations
+                }
+            )
+
+            
         } catch (error) {
             console.error('FetchMe error in service:', error);
             throw new Error('User not found in security context');

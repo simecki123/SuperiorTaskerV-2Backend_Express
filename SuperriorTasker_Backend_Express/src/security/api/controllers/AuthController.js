@@ -39,8 +39,12 @@ router.post('/login', validateLoginRequest, async (req, res) => {
 
 router.get('/fetchMe', authMiddleware, async (req, res) => {
     try {
-        console.log(req.cookies.jwt)
-        const user = await AuthService.fetchMe(req.cookies.jwt);
+        console.log(req.cookies.jwt);
+        const token = jwtUtils.getJwtFromRequest(req);
+        if (!token) {
+            return res.status(401).json({ message: 'No token provided' });
+        }
+        const user = await AuthService.fetchMe(token);
         res.status(200).json(user);
     } catch (error) { 
         res.status(400).json({ message: error.message });

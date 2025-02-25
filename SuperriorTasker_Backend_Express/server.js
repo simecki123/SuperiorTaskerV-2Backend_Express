@@ -4,6 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const authMiddleware = require('./src/security/middleware/authMiddleware');
 const authController = require('./src/security/api/controllers/authController');
+const userController = require('./src/controllers/UserController'); 
 require('dotenv').config();
 const connectDB = require('./src/config/database');
 
@@ -23,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Auth routes (no auth middleware needed for these)
 app.use('/api/auth', authController);
+
+app.use('/api/users', authMiddleware, userController);
 
 // Protected routes (everything else under /api)
 app.use('/api/*', authMiddleware, (req, res, next) => {
