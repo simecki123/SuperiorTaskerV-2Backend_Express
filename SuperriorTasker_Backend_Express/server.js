@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const authMiddleware = require('./src/security/middleware/authMiddleware');
 const authController = require('./src/security/api/controllers/authController');
 const userController = require('./src/controllers/UserController'); 
+const groupController = require('./src/controllers/groupController');
 require('dotenv').config();
 const connectDB = require('./src/config/database');
 
@@ -26,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authController);
 
 app.use('/api/users', authMiddleware, userController);
+
+app.use('/api/groups', authMiddleware, groupController);
 
 // Protected routes (everything else under /api)
 app.use('/api/*', authMiddleware, (req, res, next) => {

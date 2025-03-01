@@ -8,3 +8,5 @@ class UserGroupRelationResponse {
         this.role = data.role || Role.USER;
     }
 }
+
+module.exports = UserGroupRelationResponse;

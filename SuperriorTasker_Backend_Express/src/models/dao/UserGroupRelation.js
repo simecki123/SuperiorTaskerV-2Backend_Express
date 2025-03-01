@@ -1,4 +1,3 @@
-// src/models/dao/UserGroupRelation.js
 const mongoose = require('mongoose');
 const Role = require('../enums/Role');
 
