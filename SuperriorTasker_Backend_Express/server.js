@@ -8,6 +8,7 @@ const userController = require('./src/controllers/UserController');
 const groupController = require('./src/controllers/groupController');
 const projectController = require('./src/controllers/projectController');
 const taskController = require('./src/controllers/taskController');
+const userStatisticsController = require('./src/controllers/userStatisticsController');
 require('dotenv').config();
 const connectDB = require('./src/config/database');
 
@@ -35,6 +36,8 @@ app.use('/api/groups', authMiddleware, groupController);
 app.use('/api/projects', authMiddleware, projectController);
 
 app.use('/api/tasks', authMiddleware, taskController);
+
+app.use('/api/stats', authMiddleware, userStatisticsController);
 
 // Protected routes (everything else under /api)
 app.use('/api/*', authMiddleware, (req, res, next) => {
