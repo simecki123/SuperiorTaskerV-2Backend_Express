@@ -1,6 +1,7 @@
 // server.js
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
 const cookieParser = require('cookie-parser');
 const authMiddleware = require('./src/security/middleware/authMiddleware');
 const authController = require('./src/security/api/controllers/authController');
@@ -9,10 +10,16 @@ const groupController = require('./src/controllers/groupController');
 const projectController = require('./src/controllers/projectController');
 const taskController = require('./src/controllers/taskController');
 const userStatisticsController = require('./src/controllers/userStatisticsController');
+const messageController = require('./src/controllers/messageController');
+const websocketService = require('./src/services/websocketService');
 require('dotenv').config();
 const connectDB = require('./src/config/database');
 
 const app = express();
+const server = http.createServer(app);
+
+// Initialize WebSocket
+websocketService.initialize(server);
 
 // Connect to MongoDB
 connectDB();
@@ -38,6 +45,8 @@ app.use('/api/projects', authMiddleware, projectController);
 app.use('/api/tasks', authMiddleware, taskController);
 
 app.use('/api/stats', authMiddleware, userStatisticsController);
+
+app.use('/api/messages', authMiddleware, messageController);
 
 // Protected routes (everything else under /api)
 app.use('/api/*', authMiddleware, (req, res, next) => {
