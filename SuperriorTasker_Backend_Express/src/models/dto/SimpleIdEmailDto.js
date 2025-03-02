@@ -4,3 +4,5 @@ class SimpleEmailDto {
         this.email = data.email;
     }
 }
+
+module.exports = SimpleEmailDto;

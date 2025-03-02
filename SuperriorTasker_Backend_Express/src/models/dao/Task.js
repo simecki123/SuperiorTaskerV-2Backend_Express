@@ -3,17 +3,17 @@ const TaskStatus = require('../enums/TaskStatus');
 
 const taskSchema = new mongoose.Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         required: true,
         ref: 'User'
     },
     groupId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         required: true,
         ref: 'Group'
     },
     projectId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         required: true,
         ref: 'Project'
     },
@@ -25,11 +25,6 @@ const taskSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    taskStatus: {
-        type: String,
-        enum: Object.values(TaskStatus),
-        default: TaskStatus.TODO
-    },
     startDate: {
         type: Date,
         required: true
@@ -37,7 +32,12 @@ const taskSchema = new mongoose.Schema({
     endDate: {
         type: Date,
         required: true
-    }
+    },
+    status: {
+        type: String,
+        enum: Object.values(TaskStatus),
+        default: TaskStatus.IN_PROGRESS
+    } 
 }, {
     timestamps: {
         createdAt: 'createdAt',

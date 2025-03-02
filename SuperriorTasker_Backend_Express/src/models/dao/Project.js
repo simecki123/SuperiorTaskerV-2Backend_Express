@@ -2,15 +2,9 @@ const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
     groupId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Group',
         required: [true, 'Group ID is required'],
-        maxLength: 50
-    },
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: [true, 'User ID is required'],
         maxLength: 50
     },
     name: {

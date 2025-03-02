@@ -11,4 +11,4 @@ class ProjectResponse {
     }
 }
 
-module.export = ProjectResponse;
+module.exports = ProjectResponse;
