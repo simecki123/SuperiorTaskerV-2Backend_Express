@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const TaskService = require('../services/taskService');
+const TaskStatus = require('../models/enums/TaskStatus');
 
 router.post('/createTask', async (req, res) => {
     try {
@@ -60,10 +61,16 @@ router.get('/getFilteredTasks', async (req, res) => {
 
 router.patch('/update-task-status', async (req, res) => {
     try {
-        const { taskId, status } = req.query;
-        console.log('Updating task status...');
+        const { taskId, taskStatus } = req.query;
+        console.log('Updating task status...', { taskId, taskStatus });
         
-        const response = await TaskService.updateTaskStatus(taskId, status);
+        if (!Object.values(TaskStatus).includes(taskStatus)) {
+            return res.status(400).json({ 
+                message: `Invalid task status. Must be one of: ${Object.values(TaskStatus).join(', ')}` 
+            });
+        }
+        
+        const response = await TaskService.updateTaskStatus(taskId, taskStatus);
         res.status(200).json({ message: response });
     } catch (error) {
         console.error('Error updating task status:', error);

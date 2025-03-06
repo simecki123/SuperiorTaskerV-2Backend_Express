@@ -5,7 +5,7 @@ class UserStatisticsDto {
         this.numberOfUnfinishedTasks = data.numberOfUnfinishedTasks || 0;
         this.numberOfProjects = data.numberOfProjects || 0;
         this.numberOfCompletedProjects = data.numberOfCompletedProjects || 0;
-        this.numberOfIncompletedProjects = data.numberOfIncompletedProjects || 0;
+        this.numberOfIncompleteProjects = data.numberOfIncompleteProjects || 0;
     }
 }
 

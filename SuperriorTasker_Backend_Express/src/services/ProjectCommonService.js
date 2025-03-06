@@ -10,12 +10,22 @@ class ProjectCommonService {
         console.log('Fetching project');
 
         const taskList = await Task.find({ projectId: id });
-        console.log('Returning task list', taskList);
+        console.log(`Found ${taskList.length} tasks for project ${id}`);
+        
+        // Debug the task statuses to see what's going on
+        taskList.forEach(task => {
+            console.log(`Task ${task._id}: status = "${task.status}"`);
+        });
         
         let completionSum = 0.0;
         for (const task of taskList) {
+            // Make sure we're checking the status correctly
+            // The issue may be caused by case sensitivity or different string representations
             if (task.status === 'COMPLETED') {
                 completionSum += 1;
+                console.log(`Task ${task._id} is completed`);
+            } else {
+                console.log(`Task ${task._id} is not completed, status = "${task.status}"`);
             }
         }
 
@@ -23,10 +33,17 @@ class ProjectCommonService {
             ? this.round((completionSum / taskList.length) * 100) 
             : 0.0;
 
-        console.log("Completion ", completion);
+        console.log(`Project completion calculation: ${completionSum} / ${taskList.length} * 100 = ${completion}%`);
 
-        project.completion = completion;
-        await project.save();
+        // Use updateOne to ensure we're updating properly
+        const updateResult = await Project.updateOne(
+            { _id: id },
+            { $set: { completion: completion } }
+        );
+        
+        console.log('Project update result:', updateResult);
+        
+        return completion;
     }
 
     round(value) {

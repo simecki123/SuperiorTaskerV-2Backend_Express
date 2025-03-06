@@ -28,7 +28,7 @@ class UserStatisticsService {
             numberOfUnfinishedTasks: inProgressTasks,
             numberOfProjects: totalProjects,
             numberOfCompletedProjects: completedProjects,
-            numberOfIncompletedProjects: incompleteProjects
+            numberOfIncompleteProjects: incompleteProjects
         });
     }
 }

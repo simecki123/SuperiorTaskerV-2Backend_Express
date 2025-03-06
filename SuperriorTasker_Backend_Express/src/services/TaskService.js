@@ -68,7 +68,7 @@ class TaskService {
         }
         
         if (taskStatus) {
-            criteria.taskStatus = taskStatus;
+            criteria.status = taskStatus;
         }
         
         if (search) {
@@ -89,7 +89,7 @@ class TaskService {
             projectId: task.projectId,
             name: task.name,
             description: task.description,
-            taskStatus: task.taskStatus,
+            taskStatus: task.status,
             startDate: task.startDate,
             endDate: task.endDate
         }));
@@ -101,8 +101,16 @@ class TaskService {
             throw new Error('There is no task with that id, so it cannot be updated!');
         }
         
-        task.status = taskStatus;
-        await task.save();
+        const updateResult = await Task.updateOne(
+            { _id: id },
+            { $set: { status: taskStatus } }
+        );
+        
+        console.log('Task update result:', updateResult);
+        
+        if (updateResult.modifiedCount === 0) {
+            console.warn('No changes made to task status - it may already be set to this value');
+        }
         
         console.log('Updating completion of the project...');
         await ProjectCommonService.updateProjectCompletion(task.projectId);
