@@ -24,33 +24,44 @@ router.get('/getFilteredProjects', async (req, res) => {
         const { 
             userId, 
             groupId, 
-            startCompletion = 0, 
-            endCompletion = 100,
-            includeComplete = false, 
-            includeNotStarted = false, 
+            startCompletion = "0", 
+            endCompletion = "100",
+            includeComplete = "false", 
+            includeNotStarted = "false", 
             search,
-            page = 0,
-            size = 4
+            page = "0",
+            size = "4"
         } = req.query;
 
         console.log('Received request with userId:', userId);
+        console.log('Query parameters:', req.query);
         
-        if (parseFloat(startCompletion) > parseFloat(endCompletion)) {
+        const startCompletionValue = startCompletion === "" ? 0 : parseFloat(startCompletion);
+        const endCompletionValue = endCompletion === "" ? 100 : parseFloat(endCompletion);
+        
+        if (isNaN(startCompletionValue) || isNaN(endCompletionValue)) {
+            return res.status(400).json({ message: 'Invalid completion values' });
+        }
+        
+        if (startCompletionValue > endCompletionValue) {
             return res.status(400).json({ message: 'Start completion cannot be greater than end completion' });
         }
         
         const pageable = {
-            page: parseInt(page),
-            size: parseInt(size)
+            page: parseInt(page, 10) || 0,
+            size: parseInt(size, 10) || 4
         };
+        
+        const includeCompleteValue = includeComplete === "true";
+        const includeNotStartedValue = includeNotStarted === "true";
         
         const projects = await ProjectService.getAllProjects(
             userId, 
             groupId, 
-            parseFloat(startCompletion), 
-            parseFloat(endCompletion),
-            includeComplete === 'true', 
-            includeNotStarted === 'true', 
+            startCompletionValue, 
+            endCompletionValue,
+            includeCompleteValue, 
+            includeNotStartedValue, 
             search, 
             pageable
         );

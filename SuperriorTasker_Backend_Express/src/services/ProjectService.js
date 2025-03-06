@@ -39,69 +39,74 @@ class ProjectService {
     }
 
     async getAllProjects(userId, groupId, startCompletion, endCompletion, 
-                         includeComplete, includeNotStarted, search, pageable) {
+        includeComplete, includeNotStarted, search, pageable) {
         const criteria = {};
-        
+
         if (groupId) {
             criteria.groupId = groupId;
         }
-        
+
         if (search) {
             criteria.name = { $regex: search, $options: 'i' };
         }
-        
+
         const completionCriteria = [];
-        
-        if (includeComplete) {
+
+        if (includeComplete === true) {
             completionCriteria.push({ completion: 100.0 });
         }
-        
-        if (includeNotStarted) {
+
+        if (includeNotStarted === true) {
             completionCriteria.push({ completion: 0.0 });
         }
-        
-        if (startCompletion !== null || endCompletion !== null) {
+
+        // Make sure we're dealing with numbers, not strings
+        const startCompletionNum = typeof startCompletion === 'number' ? startCompletion : parseFloat(startCompletion);
+        const endCompletionNum = typeof endCompletion === 'number' ? endCompletion : parseFloat(endCompletion);
+
+        if (!isNaN(startCompletionNum) || !isNaN(endCompletionNum)) {
             const rangeCriteria = {};
-            if (startCompletion !== null) {
-                rangeCriteria.$gte = startCompletion;
+            if (!isNaN(startCompletionNum)) {
+                rangeCriteria.$gte = startCompletionNum;
             }
-            if (endCompletion !== null) {
-                rangeCriteria.$lte = endCompletion;
+            if (!isNaN(endCompletionNum)) {
+                rangeCriteria.$lte = endCompletionNum;
             }
             completionCriteria.push({ completion: rangeCriteria });
         }
-        
+
         if (completionCriteria.length > 0) {
             criteria.$or = completionCriteria;
         }
-        
+
+        console.log('Query criteria:', JSON.stringify(criteria, null, 2));
+
         let projects = await Project.find(criteria)
-            .sort({ createdAt: -1 })
-            .skip(pageable.page * pageable.size)
-            .limit(pageable.size);
-            
+        .sort({ createdAt: -1 })
+        .skip(pageable.page * pageable.size)
+        .limit(pageable.size);
+
         console.log('Found', projects.length, 'results');
-        
+
         if (userId) {
             const filteredProjects = [];
-            
+
             for (const project of projects) {
                 const request = {
                     userId: userId,
                     projectId: project._id.toString(),
                     groupId: project.groupId
                 };
-                
+
                 const response = await TaskService.fetchUserProjectRelations([request]);
                 if (response.length > 0) {
                     filteredProjects.push(project);
                 }
             }
-            
+
             projects = filteredProjects;
         }
-        console.log("Projects ", projects)
-        
+
         return projects.map(project => new ProjectResponse({
             id: project._id,
             groupId: project.groupId,
