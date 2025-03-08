@@ -32,20 +32,39 @@ class WebSocketService {
 
     async notifyGroupUsersOfNewMessage(message) {
         try {
+            // Ensure IDs are strings for querying
+            const groupId = message.groupId.toString();
+            const userProfileId = message.userProfileId.toString();
+            
+            console.log(`Finding members of group ${groupId} excluding sender ${userProfileId}`);
+            
+            // Query for all members of the group except the sender
             const memberships = await UserGroupRelation.find({
-                groupId: message.groupId,
-                userId: { $ne: message.userProfileId }
+                groupId: groupId,
+                userId: { $ne: userProfileId }
             });
 
             console.log(`Notifying ${memberships.length} members of the group with a new message`);
 
-            if (message.photoUri) {
-                message.photoUri = await s3Service.getPhotoUrl(message.photoUri);
+            // Process message for sending
+            const messageToSend = { ...message };
+            
+            // Ensure all IDs are strings
+            if (messageToSend._id) messageToSend.id = messageToSend._id.toString();
+            if (messageToSend.groupId) messageToSend.groupId = messageToSend.groupId.toString();
+            if (messageToSend.userProfileId) messageToSend.userProfileId = messageToSend.userProfileId.toString();
+            
+            // Get photo URL if needed
+            if (messageToSend.photoUri) {
+                messageToSend.photoUri = await s3Service.getPhotoUrl(messageToSend.photoUri);
             }
 
+            // Notify each member
             for (const membership of memberships) {
-                const roomId = `messages.${membership.userId}`;
-                io.to(roomId).emit('new-message', message);
+                const userId = membership.userId.toString();
+                const roomId = `messages.${userId}`;
+                console.log(`Emitting message to user ${userId} in room ${roomId}`);
+                io.to(roomId).emit('new-message', messageToSend);
             }
         } catch (error) {
             console.error('Error notifying group users:', error);

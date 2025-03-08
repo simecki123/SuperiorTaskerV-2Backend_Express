@@ -3,7 +3,7 @@ const MessageStatus = require('../enums/MessageStatus');
 
 const messageSchema = new mongoose.Schema({
     groupId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Group',
         required: [true, 'Group ID is required'],
         maxLength: 50
@@ -19,7 +19,7 @@ const messageSchema = new mongoose.Schema({
         required: true
     },
     userProfileId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'User'
     },
     firstName: String,
